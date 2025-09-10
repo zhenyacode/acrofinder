@@ -17,10 +17,12 @@ class Scanner:
     def __init__(self, min_word_sizes: List[int] = [5],
                  dictionary_path: str =""):
     
-        self.patterns = {'paragraph': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
+        self.PATTERNS = {'paragraph': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
                          'sentence': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|(?<=[\.\!\?])[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
                          'word': r'\b[A-Za-zА-Яа-яЁё]'}
     
+        # Надо сделать кастомизируемым или минимум: прибить
+        # гвоздями наиболее удобные настройки
         # self.vicinity_range = vicinity_range
         # self.context_range = context_range
         # self.addendum_range = addendum_range
@@ -41,21 +43,22 @@ class Scanner:
         self.min_word_sizes = min_word_sizes
         self.n_dicts = self._load_n_dicts(self.dictionary, self.min_word_sizes)
 
-        self.patterns = {'paragraph': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
-                         'sentence': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|(?<=[\.\!\?])[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
-                         'word': r'\b[A-Za-zА-Яа-яЁё]'}
 
-    def find_candidates(self, text: str, levels:List[str] = ['word']) -> pd.DataFrame:
+    def scan_text(self, text: str, levels:List[str] = ['word']) -> pd.DataFrame:
         """
         Ищет всех кандидатов на акростихи в переданном тексте, 
         возвращает датафрейм с кандидатами (+ окрестности слева и справа), контекстом
         и адресом в тексте -- все уровни в одном датафрейме с соответствующим значением
         в столбце уровень
+
         
         Аргументы:
         text (str): текст, в котором производится поиск акростихов
         levels [str, str, ...]: набор уровней, на которых ищем акростихи (слова, предожения, абзацы)
         """
+
+# TO DO: реализовать последующую фильтрацию найденных кандидатов, пытаясь достроить до
+# full_word, чтобы отсечь побольше случайных совпадений
 
         valid_levels = ['paragraph', 'sentence', 'word']
         for level in levels:
@@ -79,8 +82,6 @@ class Scanner:
             rows = self._get_candidates(self.first_letters[level], level)
             all_rows.extend(rows)  # ← добавляем в общий список
 
-        self.text = None
-
         # Создаём ОДИН DataFrame в конце
         columns = ['id', 'n_gram_size', 'word', 'vicinity', 'context', 'level']
         return pd.DataFrame(all_rows, columns=columns) if all_rows else pd.DataFrame(columns=columns)
@@ -94,8 +95,8 @@ class Scanner:
         """
 
         very_first_letter = r'^[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|'
-        found = re.findall(very_first_letter+self.patterns[level], text)
-        self.cache_results[level] = list(re.finditer(very_first_letter+self.patterns[level], text))
+        found = re.findall(very_first_letter+self.PATTERNS[level], text)
+        self.cache_results[level] = list(re.finditer(very_first_letter+self.PATTERNS[level], text))
         return [elem[-1].lower() for elem in found]
 
 
@@ -126,20 +127,7 @@ class Scanner:
         return rows
 
 
-        # candidates = {}
 
-        # for n_gram_size in self.min_word_sizes:
-        #     n_grams = self._get_n_grams(n_gram_size, first_letters)
-        #     n_dict = self.n_dicts[n_gram_size]
-
-        #     for id in range(len(n_grams)):
-        #         word = n_grams[id]
-        #         if word in n_dict:
-        #             vicinity = self._get_vicinity(level, id, n_gram_size)
-        #             context = self._get_context(level, id, self.context_range)
-        #             candidates[str(id)+'-'+str(n_gram_size)] = [word, vicinity, context]
-            
-        # return candidates
 
     def _get_vicinity(self, level: str, id: int, n_gram_size: int) -> str:
         """
@@ -213,14 +201,6 @@ class Scanner:
    
         return n_grams
 
-
-    def _get_context(self, level: str, id: int, range: int) -> str:
-        
-        position = self.cache_results[level][id].span()[0]
-
-        context = self.text[position: position + range]
-
-        return context
 
 
 
