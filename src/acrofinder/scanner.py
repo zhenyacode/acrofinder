@@ -3,6 +3,19 @@ from typing import List, Set, Dict
 import pandas as pd
 from pathlib import Path
 
+from dataclasses import dataclass, asdict
+
+@dataclass
+class AcrosticCandidate:
+    id: int
+    n_gram_size: int
+    word: str
+    vicinity: str
+    context: str
+    level: str
+
+    def to_dict(self):
+        return asdict(self)
 
 
 class Scanner:
@@ -83,19 +96,20 @@ class Scanner:
                               'sentence': None,
                               'word': None}
                 
-        all_rows = []  
+        all_candidates = []  
 
         for level in levels:
             self.first_letters[level] = self._get_first_letters(text, level)
 
 
         for level in levels:
-            rows = self._get_candidates(self.first_letters[level], level)
-            all_rows.extend(rows)  
+            candidates = self._get_candidates(self.first_letters[level], level)
+            all_candidates.extend(candidates)  
 
         # Создаём ОДИН DataFrame в конце
         columns = ['id', 'n_gram_size', 'word', 'vicinity', 'context', 'level']
-        results = pd.DataFrame(all_rows, columns=columns) if all_rows else pd.DataFrame(columns=columns)
+        results = pd.DataFrame([c.to_dict() for c in all_candidates], 
+                               columns=columns) if all_candidates else pd.DataFrame(columns=columns)
 
         return results
 
@@ -120,7 +134,7 @@ class Scanner:
         получает окрестности и контекст и включает соответствующее совпадение в результаты
         """
 
-        rows = []
+        candidates = []
         for n_gram_size in self.min_word_sizes:
             n_grams = self._get_n_grams(n_gram_size, first_letters)
             n_dict = self.n_dicts[n_gram_size]
@@ -129,15 +143,14 @@ class Scanner:
                 if word in n_dict:
                     vicinity = self._get_vicinity(level, id, n_gram_size)
                     context = self._get_context(level, id, self.context_range)
-                    rows.append({
-                        'id': id,
-                        'n_gram_size': n_gram_size,
-                        'word': word,
-                        'vicinity': vicinity,
-                        'context': context,
-                        'level': level
-                    })
-        return rows
+                
+                    candidates.append(AcrosticCandidate(id=id,
+                                                        n_gram_size=n_gram_size,
+                                                        word=word,
+                                                        vicinity=vicinity,
+                                                        context=context,
+                                                        level=level))
+        return candidates
 
 
 
