@@ -6,17 +6,22 @@ import pandas as pd
 class Scanner:
     """
     Осуществляет поиск акростихов в тексте
-
-    Аргументы:
-        min_word_sizes [int, int, ...]: скольким буквам нужно совпасть со словом из словаря, 
-        чтобы нас заинтересовать 
-        dictionary_path (str): путь к словарю в формате txt, 
-        на основе которого будет вестись поиск
     """
 
     def __init__(self, min_word_sizes: List[int] = [5],
-                 dictionary_path: str =""):
-    
+                 dictionary_path: str ="") -> None:
+
+        """
+        Создаёт объект Scanner, инициализирует конфигурацию (vicinity-, context-, 
+        addendum-range, паттерны поиска), загружает словарь, делает из него 
+        словари n-грамм для более эффективного поиска
+
+        Аргументы:
+            min_word_sizes [int, int, ...]: скольким буквам нужно совпасть со словом из словаря, 
+            чтобы сочетание букв попало в кандидаты в акростихи 
+            dictionary_path (str): путь к словарю в формате txt, на основе которого будет 
+            вестись поиск
+        """    
         self.PATTERNS = {'paragraph': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
                          'sentence': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|(?<=[\.\!\?])[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
                          'word': r'\b[A-Za-zА-Яа-яЁё]'}
@@ -46,19 +51,24 @@ class Scanner:
 
     def scan_text(self, text: str, levels:List[str] = ['word']) -> pd.DataFrame:
         """
-        Ищет всех кандидатов на акростихи в переданном тексте, 
-        возвращает датафрейм с кандидатами (+ окрестности слева и справа), контекстом
-        и адресом в тексте -- все уровни в одном датафрейме с соответствующим значением
+        Ищет все возможные акростихи в переданном тексте, возвращает датафрейм с 
+        кандидатами (+ окрестности слева и справа) и контекстом в тексте 
+        -- все уровни в одном датафрейме с соответствующим значением
         в столбце уровень
 
-        
         Аргументы:
-        text (str): текст, в котором производится поиск акростихов
-        levels [str, str, ...]: набор уровней, на которых ищем акростихи (слова, предожения, абзацы)
+            text (str): текст, в котором производится поиск акростихов
+            levels [str, str, ...]: набор уровней, на которых производится поиск (слова, 
+            предложения, абзацы)
+
+        Возвращает:
+            results (pd.DataFrame): сводная таблица результатов поиска 
+            (id / размер n-граммы / слово-кандидат / окрестности / контекст / уровень поиска)
+
         """
 
-# TO DO: реализовать последующую фильтрацию найденных кандидатов, пытаясь достроить до
-# full_word, чтобы отсечь побольше случайных совпадений
+        # TO DO: реализовать последующую фильтрацию найденных кандидатов, пытаясь достроить до
+        # full_word, чтобы отсечь побольше случайных совпадений
 
         valid_levels = ['paragraph', 'sentence', 'word']
         for level in levels:
@@ -72,7 +82,7 @@ class Scanner:
                               'sentence': None,
                               'word': None}
                 
-        all_rows = []  # ← собираем ВСЕ строки здесь
+        all_rows = []  
 
         for level in levels:
             self.first_letters[level] = self._get_first_letters(text, level)
@@ -80,15 +90,17 @@ class Scanner:
 
         for level in levels:
             rows = self._get_candidates(self.first_letters[level], level)
-            all_rows.extend(rows)  # ← добавляем в общий список
+            all_rows.extend(rows)  
 
         # Создаём ОДИН DataFrame в конце
         columns = ['id', 'n_gram_size', 'word', 'vicinity', 'context', 'level']
-        return pd.DataFrame(all_rows, columns=columns) if all_rows else pd.DataFrame(columns=columns)
+        results = pd.DataFrame(all_rows, columns=columns) if all_rows else pd.DataFrame(columns=columns)
+
+        return results
 
 
 
-    def _get_first_letters(self, text: str, level: str) -> list[str]:
+    def _get_first_letters(self, text: str, level: str) -> List[str]:
         """
         Проходит по тексту и возвращает первые буквы каждого объекта 
         соответствующего уровня (параграфы, предложения, слова)
@@ -100,7 +112,7 @@ class Scanner:
         return [elem[-1].lower() for elem in found]
 
 
-    def _get_candidates(self, first_letters: List[str], level: str) -> dict[str, str]:
+    def _get_candidates(self, first_letters: List[str], level: str) -> Dict[str, str]:
         """
         Получает для первых букв список n-грамм всех размеров, заданных self.min_word_sizes,
         по каждому списку проходит, сравнивая n-граммы со словарными, и если есть совпадение,
@@ -179,7 +191,7 @@ class Scanner:
         return n_dicts
 
 
-    def _get_n_gram_dict(self, dictionary: Set[str], n_gram_size: int) -> set[str]:
+    def _get_n_gram_dict(self, dictionary: Set[str], n_gram_size: int) -> Set[str]:
         """
         Принимает на вход множество слов и единственный размер n-граммы, 
         возвращает словарь n-грам, сделанных из слов длины >= n
@@ -189,7 +201,7 @@ class Scanner:
         return set(n_dict)
 
 
-    def _get_n_grams(self, n_gram_size: int, letters: list[str]) -> list[str]:
+    def _get_n_grams(self, n_gram_size: int, letters: list[str]) -> List[str]:
         """
         Принимает на вход размер n-граммы, список букв, и составляет скользящим окном
         из букв n-граммы заданного размера
@@ -206,7 +218,7 @@ class Scanner:
 
 # TO DO методы
 
-    def _load_dictionary(self, dictionary_path) -> set[str]:
+    def _load_dictionary(self, dictionary_path) -> Set[str]:
         """
         Загружает словарь из файла txt
         """ 
