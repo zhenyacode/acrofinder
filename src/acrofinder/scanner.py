@@ -1,6 +1,8 @@
 import re
 from typing import List, Set, Dict
 import pandas as pd
+from pathlib import Path
+
 
 
 class Scanner:
@@ -9,7 +11,7 @@ class Scanner:
     """
 
     def __init__(self, min_word_sizes: List[int] = [5],
-                 dictionary_path: str ="") -> None:
+                 dictionary_name: str ="") -> None:
 
         """
         Создаёт объект Scanner, инициализирует конфигурацию (vicinity-, context-, 
@@ -19,8 +21,8 @@ class Scanner:
         Аргументы:
             min_word_sizes [int, int, ...]: скольким буквам нужно совпасть со словом из словаря, 
             чтобы сочетание букв попало в кандидаты в акростихи 
-            dictionary_path (str): путь к словарю в формате txt, на основе которого будет 
-            вестись поиск
+            dictionary_name (str): название файла со словарём, лежащего в папке dicts, 
+            на основе которого будет вестись поиск
         """    
         self.PATTERNS = {'paragraph': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
                          'sentence': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|(?<=[\.\!\?])[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
@@ -41,8 +43,7 @@ class Scanner:
         self.cache_results = {}
 
         # пока заглушка вместо загрузки словаря
-        # self.dictionary = self._load_dictionary(dictionary_path)
-        self.dictionary = {'альфа', 'бета'}
+        self.dictionary = self._load_dictionary(dictionary_name)
         self.first_letters = []
 
         self.min_word_sizes = min_word_sizes
@@ -218,9 +219,28 @@ class Scanner:
 
 # TO DO методы
 
-    def _load_dictionary(self, dictionary_path) -> Set[str]:
+    def _load_dictionary(self, dictionary_name: str) -> Set[str]:
         """
         Загружает словарь из файла txt
         """ 
 
-        pass
+        path = self._get_dict_path(dictionary_name)
+        with open(path, encoding='utf-8') as f:
+            words = f.read().splitlines()
+
+
+        return set(words)
+
+
+    def _get_dict_path(self, filename: str) -> Path:
+        """
+        Делает из названия файла со словарём путь до словаря, по которому его можно
+        загрузить
+        """
+        # Поднимаемся от src/acrofinder/ на два уровня — в корень проекта
+        root_dir = Path(__file__).parent.parent.parent 
+        dict_path = root_dir / "data" / "dicts" / filename
+
+        if not dict_path.exists():
+            raise FileNotFoundError(f"Dictionary file not found: {dict_path}")
+        return dict_path
