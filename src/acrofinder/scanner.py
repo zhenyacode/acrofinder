@@ -182,15 +182,18 @@ class Scanner:
         word_start = id
         word_end = id + n_gram_size
 
-        left_vicinity = "".join(first_letters[:word_start])
-        right_vicinity = "".join(first_letters[word_end:])
+        left_vicinity = first_letters[:word_start][-1*(n_gram_size):]
+        right_vicinity = first_letters[word_end:][:(n_gram_size)]
+
+        left_vicinity = "".join(left_vicinity)
+        right_vicinity = "".join(right_vicinity)
 
         if len(left_vicinity) < self.vicinity_range:
             left_dummy = '_' * (self.vicinity_range - len(left_vicinity))
             left_vicinity = left_dummy + left_vicinity
 
         if len(right_vicinity) < self.vicinity_range:
-            right_dummy = '_' * (self.vicinity_range - len(right_vicinity))
+            right_dummy = '_' * (self.vicinity_range - len(right_vicinity)-1)
             right_vicinity = right_dummy + right_vicinity
 
         word = "".join(first_letters[word_start:word_end])
