@@ -7,7 +7,7 @@ from dataclasses import dataclass, asdict
 
 @dataclass
 class AcrosticCandidate:
-    id: int
+    start_pos: int
     n_gram_size: int
     word: str
     vicinity: str
@@ -57,7 +57,6 @@ class Scanner:
 
         # пока заглушка вместо загрузки словаря
         self.dictionary = self._load_dictionary(dictionary_name)
-        self.first_letters = []
 
         self.min_word_sizes = min_word_sizes
         self.n_dicts = self._load_n_dicts(self.dictionary, self.min_word_sizes)
@@ -90,24 +89,15 @@ class Scanner:
                 raise ValueError(f"Invalid level: {level}. Expected one of: 'paragraph', 'sentence', 'word'")
 
 
-        self.text = text
-
-        self.first_letters = {'paragraph': None,
-                              'sentence': None,
-                              'word': None}
-                
         all_candidates = []  
 
-        for level in levels:
-            self.first_letters[level] = self._get_first_letters(text, level)
-
 
         for level in levels:
-            candidates = self._get_candidates(self.first_letters[level], level)
+            candidates = self._get_candidates(text, level)
             all_candidates.extend(candidates)  
 
         # Создаём ОДИН DataFrame в конце
-        columns = ['id', 'n_gram_size', 'word', 'vicinity', 'context', 'level']
+        columns = ['start_pos', 'n_gram_size', 'word', 'vicinity', 'context', 'level']
         results = pd.DataFrame([c.to_dict() for c in all_candidates], 
                                columns=columns) if all_candidates else pd.DataFrame(columns=columns)
 
@@ -115,45 +105,74 @@ class Scanner:
 
 
 
-    def _get_first_letters(self, text: str, level: str) -> List[str]:
-        """
-        Проходит по тексту и возвращает первые буквы каждого объекта 
-        соответствующего уровня (параграфы, предложения, слова)
-        """
 
-        very_first_letter = r'^[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|'
-        found = re.findall(very_first_letter+self.PATTERNS[level], text)
-        self.cache_results[level] = list(re.finditer(very_first_letter+self.PATTERNS[level], text))
-        return [elem[-1].lower() for elem in found]
-
-
-    def _get_candidates(self, first_letters: List[str], level: str) -> Dict[str, str]:
+    def _get_candidates(self, text: str, level: str) -> Dict[str, str]:
         """
-        Получает для первых букв список n-грамм всех размеров, заданных self.min_word_sizes,
+        Получает для текста на соответствующем уровне (слова, предложения, парграфы) набор первых 
+        букв, из которого получает список n-грамм всех размеров, заданных self.min_word_sizes,
         по каждому списку проходит, сравнивая n-граммы со словарными, и если есть совпадение,
         получает окрестности и контекст и включает соответствующее совпадение в результаты
         """
 
+        first_letters, matches = self._get_first_letters_and_matches(text, level)
+
         candidates = []
+
+        # для n-граммы каждого размера получаем кандидатов
         for n_gram_size in self.min_word_sizes:
             n_grams = self._get_n_grams(n_gram_size, first_letters)
             n_dict = self.n_dicts[n_gram_size]
-            for id in range(len(n_grams)):
-                word = n_grams[id]
-                if word in n_dict:
-                    vicinity = self._get_vicinity(level, id, n_gram_size)
-                    context = self._get_context(level, id, self.context_range)
-                
-                    candidates.append(AcrosticCandidate(id=id,
-                                                        n_gram_size=n_gram_size,
-                                                        word=word,
-                                                        vicinity=vicinity,
-                                                        context=context,
-                                                        level=level))
+            all_n_grams = range(len(n_grams))
+            
+            for id in all_n_grams:
+                possible_word = n_grams[id]
+                if possible_word in n_dict:
+                    candidate = self._make_candidate(text, possible_word, level, 
+                                                     first_letters, matches, id, 
+                                                     n_gram_size)
+                    candidates.append(candidate)
+        
         return candidates
 
 
-    def _get_vicinity(self, level: str, id: int, n_gram_size: int) -> str:
+    def _make_candidate(self, text: str, word: str, level: str, 
+                        first_letters: List[str], matches: List[re.Match],
+                        id: int, n_gram_size: int) -> AcrosticCandidate:
+        """
+        Собирает на входящих параметрах из слова, окрестностей и контекста
+        строчку про кандидата в соответствующей форме.
+        """
+        
+        vicinity = self._get_vicinity(first_letters, id, n_gram_size)
+        context = self._get_context(text, matches, id)
+
+        start_position = matches[id].span()[0]
+
+        candidate = AcrosticCandidate(start_pos=start_position,
+                                      n_gram_size=n_gram_size,
+                                      word=word,
+                                      vicinity=vicinity,
+                                      context=context,
+                                      level=level)
+        return candidate
+
+    def _get_first_letters_and_matches(self, text: str, 
+                                       level: str) -> tuple[List[str], List[re.Match]]:
+        """
+        Проходит по тексту и возвращает первые буквы каждого объекта 
+        соответствующего уровня (параграфы, предложения, слова), а также
+        соответствующие мэтч-объекты
+        """
+
+        very_first_letter = r'^[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|'
+        pattern = very_first_letter+self.PATTERNS[level]
+        matches = list(re.finditer(pattern, text))
+        first_letters = [m.group()[-1].lower() for m in matches]
+
+        return first_letters, matches
+
+
+    def _get_vicinity(self, first_letters: List[str], id: int, n_gram_size: int) -> str:
         """
         Возвращает окрестности слева и справа для заданных позиций (т.е. для позиций в списке
         первых букв найденного кандидата в акростихи), если слева не хватает символов, заполняет их
@@ -169,21 +188,18 @@ class Scanner:
             r_range = self.vicinity_range
             left_dummy = ''
 
-        vicinity = self.first_letters[level][id - l_range : id + n_gram_size + r_range]
+        vicinity = first_letters[id - l_range : id + n_gram_size + r_range]
 
         return left_dummy + ''.join(vicinity)
 
 
-    def _get_context(self, level: str, id: int, range: int) -> str:
+    def _get_context(self, text:str, matches: List[re.Match], id: int) -> str:
         """
-        Из кэшированных результатов соответствующего поиска первых букв (объект re.Match, хранится в 
-        self.cache_results[level][id], где id -- это порядковый номер n-граммы в списке, что 
-        соответствует порядковому номеру первой буквы) получает позицию в исходном тексте и дальше 
-        возвращает соответствующий слайс текста
+        Получает контекст по позиции найденного совпадения
         """
-        position = self.cache_results[level][id].span()[0]
+        position = matches[id].span()[0]
 
-        context = self.text[position: position + range]
+        context = text[position: position + self.context_range]
 
         return context
 
