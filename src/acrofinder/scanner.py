@@ -129,6 +129,7 @@ class Scanner:
             List[AcrosticCandidate]: найденные слова-кандидаты и сопутствующая информация.
         """
 
+        text = self._normalize_text(text)
         first_letters, matches = self._get_first_letters_and_matches(text, level)
 
         candidates = []
@@ -149,7 +150,7 @@ class Scanner:
                         if possible_word in self.dictionary:
                             candidate = self._make_candidate(text, possible_word, level, 
                                                         first_letters, matches, id, 
-                                                        n_gram_size)
+                                                        len(possible_word))
                             candidates.append(candidate)
 
                         last_len = len(possible_word)
@@ -159,6 +160,39 @@ class Scanner:
 
 
         return candidates
+
+
+    def _normalize_text(self, text: str) -> str:
+        text = self._normalize_spaced_letters(text)
+        text = self._normalize_hyphenated_letters(text)
+
+        return text
+
+
+    def _normalize_spaced_letters(self, text: str) -> str:
+        """
+        Убирает из текста вот т а к у ю разрядку пробелами, чтобы исключить 
+        ложные срабатывания при поиске кандидатов
+        """
+        pattern = re.compile(r'(?:[A-Za-zА-Яа-яЁё](?:\s{1,3}[A-Za-zА-Яа-яЁё]){2,})')
+
+        def replacer(match: re.Match) -> str:
+            return match.group(0).replace(" ", "")
+
+        return pattern.sub(replacer, text)
+
+    def _normalize_hyphenated_letters(self, text: str) -> str:
+        """
+        Убирает из текста вот т-а-к-о-й вариант написания, чтобы исключить
+        ложные срабатывания
+        """
+
+        pattern = re.compile(r'(?:[A-Za-zА-Яа-яЁё](?:[-–—]{1,3}[A-Za-zА-Яа-яЁё]){2,})')
+
+        def replacer(match: re.Match) -> str:
+            return re.sub(r'[-–—]', '', match.group(0))  # убрать все виды дефисов
+
+        return pattern.sub(replacer, text)
 
 
     def _add_letter(self, first_letters: List[str], id: int, possible_word: str) -> str:
