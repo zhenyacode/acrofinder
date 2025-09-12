@@ -178,19 +178,25 @@ class Scanner:
         первых букв найденного кандидата в акростихи), если слева не хватает символов, заполняет их
         нижними подчёркиваниями
         """
-        if id < self.vicinity_range:
-            l_range = id
-            r_range = self.vicinity_range
-            left_dummy = '_' * (self.vicinity_range - id)
-            
-        else:
-            l_range = self.vicinity_range
-            r_range = self.vicinity_range
-            left_dummy = ''
 
-        vicinity = first_letters[id - l_range : id + n_gram_size + r_range]
+        word_start = id
+        word_end = id + n_gram_size
 
-        return left_dummy + ''.join(vicinity)
+        left_vicinity = "".join(first_letters[:word_start])
+        right_vicinity = "".join(first_letters[word_end:])
+
+        if len(left_vicinity) < self.vicinity_range:
+            left_dummy = '_' * (self.vicinity_range - len(left_vicinity))
+            left_vicinity = left_dummy + left_vicinity
+
+        if len(right_vicinity) < self.vicinity_range:
+            right_dummy = '_' * (self.vicinity_range - len(right_vicinity))
+            right_vicinity = right_dummy + right_vicinity
+
+        word = "".join(first_letters[word_start:word_end])
+
+
+        return "".join(left_vicinity) + "_" + word.upper() + "_" + "".join(right_vicinity)
 
 
     def _get_context(self, text:str, matches: List[re.Match], id: int) -> str:
