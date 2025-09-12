@@ -50,14 +50,15 @@ class Scanner:
         self.vicinity_range = 5
         self.context_range = 100 # вместо этого надо просто все слова/ предложения, 
                                 # составляющие сочетание, возвращать
-        self.addendum_range = 1
-
 
         self.cache_results = {}
 
         # пока заглушка вместо загрузки словаря
         self.dictionary = self._load_dictionary(dictionary_name)
-
+        # TODO здесь потенциал оптимизации -- если длинных слов слишком мало
+        # то проверять все n-граммы, добивая их до max_word_length малоосмысленно
+        self.max_word_length = len(max(self.dictionary, key=len))
+        # print(f'{self.max_word_length = }') # в 20к словаре было  19
         self.min_word_sizes = min_word_sizes
         self.n_dicts = self._load_n_dicts(self.dictionary, self.min_word_sizes)
 
@@ -106,12 +107,26 @@ class Scanner:
 
 
 
-    def _get_candidates(self, text: str, level: str) -> Dict[str, str]:
+    def _get_candidates(self, text: str, level: str) -> List[AcrosticCandidate]:
         """
-        Получает для текста на соответствующем уровне (слова, предложения, парграфы) набор первых 
-        букв, из которого получает список n-грамм всех размеров, заданных self.min_word_sizes,
-        по каждому списку проходит, сравнивая n-граммы со словарными, и если есть совпадение,
-        получает окрестности и контекст и включает соответствующее совпадение в результаты
+        Формирует список слов-кандидатов из последовательности первых букв элементов текста
+        на заданном уровне (слова, предложения или абзацы).
+
+        Алгоритм:
+          1. Извлекает первые буквы всех единиц указанного уровня.
+          2. Строит из них n-граммы длиной из self.min_word_sizes.
+          3. Для каждой n-граммы проверяет:
+             - если она соответствует префиксу слов словаря, то постепенно расширяет её,
+               добавляя следующие буквы;
+             - на каждом шаге фиксирует слово как кандидата, если оно есть в словаре.
+          4. В результате собирает все подходящие слова (как короткие, так и удлинённые),
+             с указанием их позиции, «окрестности» и текстового контекста.
+
+        Таким образом, из первых букв сочетания «рыбаки» будут выделены кандидаты «рыб», «рыба»,
+        «рыбак» и «рыбаки» (при условии, что такие слова есть в словаре).
+
+        Возвращает:
+            List[AcrosticCandidate]: найденные слова-кандидаты и сопутствующая информация.
         """
 
         first_letters, matches = self._get_first_letters_and_matches(text, level)
@@ -127,12 +142,37 @@ class Scanner:
             for id in all_n_grams:
                 possible_word = n_grams[id]
                 if possible_word in n_dict:
-                    candidate = self._make_candidate(text, possible_word, level, 
-                                                     first_letters, matches, id, 
-                                                     n_gram_size)
-                    candidates.append(candidate)
-        
+                    
+                    n_addenda = range(self.max_word_length - len(possible_word))
+                    
+                    for _ in n_addenda:
+                        if possible_word in self.dictionary:
+                            candidate = self._make_candidate(text, possible_word, level, 
+                                                        first_letters, matches, id, 
+                                                        n_gram_size)
+                            candidates.append(candidate)
+
+                        last_len = len(possible_word)
+                        possible_word = self._add_letter(first_letters, id, possible_word)
+                        if last_len == len(possible_word):
+                            break
+
+
         return candidates
+
+
+    def _add_letter(self, first_letters: List[str], id: int, possible_word: str) -> str:
+        """
+        Возвращает потенциальное слово с прибавленной следующей буквой из first_letters 
+        из [р, ы, б, а, к, и] и рыба вернет рыбак 
+        """
+
+        next_letter = ""
+
+        if id+len(possible_word) < len(first_letters):
+            next_letter = first_letters[id+len(possible_word)]
+
+        return possible_word + next_letter 
 
 
     def _make_candidate(self, text: str, word: str, level: str, 
