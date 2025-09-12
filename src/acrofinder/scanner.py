@@ -153,8 +153,6 @@ class Scanner:
         return candidates
 
 
-
-
     def _get_vicinity(self, level: str, id: int, n_gram_size: int) -> str:
         """
         Возвращает окрестности слева и справа для заданных позиций (т.е. для позиций в списке
@@ -227,10 +225,6 @@ class Scanner:
    
         return n_grams
 
-
-
-
-# TO DO методы
 
     def _load_dictionary(self, dictionary_name: str) -> Set[str]:
         """
