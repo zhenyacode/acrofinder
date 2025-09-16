@@ -203,7 +203,6 @@ class Scanner:
                     has_neighbour = True
                     break
 
-        print(f'Проверка {first_letters[id-10: id+10] = }')
         return has_neighbour            
 
     def _normalize_text(self, text: str) -> str:

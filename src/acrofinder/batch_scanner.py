@@ -16,7 +16,9 @@ class BatchScanner:
         self.scanner = scanner
         self.directory = directory_path
 
-    def scan_directory(self, levels: List[str] = ['word']) -> pd.DataFrame:
+    def scan_directory(self, levels: List[str] = ['word'], 
+                       filter_by_neighbours: bool = False, 
+                       min_neighbour_len: int = 1) -> pd.DataFrame:
         results = [] 
         
         files = list(self.directory.glob("*.txt"))
@@ -26,7 +28,7 @@ class BatchScanner:
                 text = file_path.read_text(encoding='utf-8')
             except:
                 text = file_path.read_text(encoding='windows-1251')
-            df = self.scanner.scan_text(text, levels)
+            df = self.scanner.scan_text(text, levels, filter_by_neighbours, min_neighbour_len)
             df['source_file'] = file_path.name 
             results.append(df)
     
