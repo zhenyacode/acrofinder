@@ -174,7 +174,7 @@ class Scanner:
         Убирает из текста вот т а к у ю разрядку пробелами, чтобы исключить 
         ложные срабатывания при поиске кандидатов
         """
-        pattern = re.compile(r'(?:[A-Za-zА-Яа-яЁё](?:\s{1,3}[A-Za-zА-Яа-яЁё]){2,})')
+        pattern = re.compile(r'\b(?:[A-Za-zА-Яа-яЁё](?:\s{1,3}[A-Za-zА-Яа-яЁё]){2,})\b')
 
         def replacer(match: re.Match) -> str:
             return match.group(0).replace(" ", "")
@@ -218,7 +218,7 @@ class Scanner:
         """
         
         vicinity = self._get_vicinity(first_letters, id, n_gram_size)
-        context = self._get_context(text, matches, id)
+        context = self._get_context(text, matches, id, id+n_gram_size)
 
         start_position = matches[id].span()[0]
 
@@ -276,13 +276,16 @@ class Scanner:
         return "".join(left_vicinity) + "_" + word.upper() + "_" + "".join(right_vicinity)
 
 
-    def _get_context(self, text:str, matches: List[re.Match], id: int) -> str:
+    def _get_context(self, text:str, matches: List[re.Match], id_start: int, id_end) -> str:
         """
         Получает контекст по позиции найденного совпадения
         """
-        position = matches[id].span()[0]
+        position_start = matches[id_start].span()[0]
+        position_end = matches[id_end].span()[0]
 
-        context = text[position: position + self.context_range]
+        enough_word_length = 10
+
+        context = text[position_start: position_end + enough_word_length]
 
         return context
 
