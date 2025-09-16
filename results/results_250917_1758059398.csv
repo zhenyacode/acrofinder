@@ -1,6 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-232551,5,хвост,ксакт_ХВОСТ_тззчт,акт,"хочешь взять отпуск?
-      - Скоро. Так ты, значит",word,rus_fiction_erenburg_ottepel_1954_povest.txt
-411731,5,пункт,чмзов_ПУНКТ_слпве,зов,"поздно, у них какое-то совещание.",word,rus_fiction_erenburg_ottepel_1954_povest.txt
-436359,5,левин,ссмеч_ЛЕВИН_внтбн,меч,"либо его восхищало или, напротив, возмущало.",word,rus_fiction_erenburg_ottepel_1954_povest.txt
-438571,6,пункте,ннчмбв_ПУНКТЕ_вкусэс,вкус,Пензе у нее кто-то есть?.. Вот кто ум,word,rus_fiction_erenburg_ottepel_1954_povest.txt

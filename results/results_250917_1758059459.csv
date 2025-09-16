@@ -1,5 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-114230,5,вести,гппор_ВЕСТИ_кпкса,пор,"Выдрали ее садовники-трудолюбцы из кадушек, п",word,rus_fiction_shmelev_solntse-mertvykh_1923_roman.txt
-254371,5,камня,гвгвм_КАМНЯ_женнч,жен," Как мухи гибнут! А все кричали -- наше!
-   Меня трогает это упорное цеплянье, борьба за жизнь. Не удержать ей мотыжку! Я беру ее сухенькую руку, благодарю за табак...
-   -- Жизн",sentence,rus_fiction_shmelev_solntse-mertvykh_1923_roman.txt

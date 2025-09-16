@@ -1,4 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-144747,5,плачу,окпот_ПЛАЧУ_мммкв,пот,"понимаешь ли, Анна, что у меня моя м",word,tolstoy_anna_karenina.txt
-432882,5,козла,псивд_КОЗЛА_атувк,ату,к одному значительному лицу. Алексей Александро,word,tolstoy_anna_karenina.txt
-645345,5,кончу,ясдиб_КОНЧУ_нотвр,нот,"книжку, он нашел, что у него остае",word,tolstoy_anna_karenina.txt

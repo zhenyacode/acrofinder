@@ -1,9 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-1011345,5,видно,вчклб_ВИДНО_днодч,дно,выехала из деревни на окончание дела неохо,word,rus_fiction_leskov_na-nozhakh_1870_roman.txt
-1448709,5,чудес,внгкп_ЧУДЕС_векпр,век,"чем уйти, долго еще стоял в ее комна",word,rus_fiction_leskov_na-nozhakh_1870_roman.txt
-1355742,5,долги,пмэти_ДОЛГИ_чадяо,эти,"   -- Да, плакала.
-   -- О чем?
-   Лариса промолчала.
-   -- Говори же: одолей себя, смирись, сознайся!
-   И Синтянина снова сжала ее руки.
-   -- Что ",paragraph,rus_fiction_leskov_na-nozhakh_1870_roman.txt

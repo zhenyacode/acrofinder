@@ -1,4 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-62718,5,тонко,овобо_ТОНКО_есвси,обо,"тихо опустился на кровать, окрестил ее со всех",word,tolstoy_detstvo_otrochestvo_yunost.txt
-62718,6,тонкое,оовобо_ТОНКОЕ_свсикв,обо,"тихо опустился на кровать, окрестил ее со всех ст",word,tolstoy_detstvo_otrochestvo_yunost.txt
-443631,5,ясное,зилвд_ЯСНОЕ_типнн,тип,Я совсем не ожидал ее такою и по,word,tolstoy_detstvo_otrochestvo_yunost.txt

@@ -1,3 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-37624,5,пепел,впмес_ПЕПЕЛ_спиот,спи,"Подавай ее, подавай ее, леший! Сейчас под",word,rus_fiction_tolstoy-a-n_knyaz-serebryanyy_1862_roman.txt
-344098,5,седло,псумм_СЕДЛО_исдуб,сумм,"спросил его, давно ли он из Слободы",word,rus_fiction_tolstoy-a-n_knyaz-serebryanyy_1862_roman.txt

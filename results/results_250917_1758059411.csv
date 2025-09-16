@@ -1,5 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-144300,5,сидим,всакт_СИДИМ_ратсп,акт,"сумасшедшей из Достоевского или мадам Роллан, а ",word,rus_fiction_gorky_zhizn-klima-samgina-4_1937_roman.txt
-391521,5,ввиду,гсува_ВВИДУ_стопи,сто,"впереди волнисто изгибалась длинная, узкая спина, туг",word,rus_fiction_gorky_zhizn-klima-samgina-4_1937_roman.txt
-541981,5,живот,ввжак_ЖИВОТ_омрас,жак,же иначе? Вон они там о марксизм,word,rus_fiction_gorky_zhizn-klima-samgina-4_1937_roman.txt
-860248,5,верят,чмсак_ВЕРЯТ_ннуат,сак,"в его руке. Я таких ненавижу, ",word,rus_fiction_gorky_zhizn-klima-samgina-4_1937_roman.txt

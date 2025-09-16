@@ -1,3 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-170563,5,особу,гопяя_ОСОБУ_акизе,аки,"озима солома..."" Он берет у Архипа кос",word,rus_nonfiction_trotsky_moya-zhizn_1930_bio.txt
-941950,5,скажи,чвпро_СКАЖИ_смлдч,про,сводит к альтернативе: жизнь или смерть. Мо,word,rus_nonfiction_trotsky_moya-zhizn_1930_bio.txt

@@ -1,5 +1,0 @@
-start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
-396597,5,синим,нанче_СИНИМ_сонип,сон,"слышится издалека.
-   - Не идет! Мухи, слышь, одо",word,rus_fiction_saltykov-tschedrin_poshekhonskaya-starina_1888_roman.txt
-979187,5,одном,фвино_ОДНОМ_учопп,вино,"он даже немало огорчил мать, увидев чер",word,rus_fiction_saltykov-tschedrin_poshekhonskaya-starina_1888_roman.txt
-979187,6,одному,кфвино_ОДНОМУ_чоппус,вино,"он даже немало огорчил мать, увидев через окно",word,rus_fiction_saltykov-tschedrin_poshekhonskaya-starina_1888_roman.txt
