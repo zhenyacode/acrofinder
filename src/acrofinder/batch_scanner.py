@@ -43,7 +43,7 @@ class BatchScanner:
 
         # Устанавливаем директорию результатов по умолчанию
         if output_dir is None:
-            output_dir = project_root / "results"
+            output_dir = project_root / "data" / "results"
 
         # Создаём директорию результатов, если её нет
         output_dir.mkdir(parents=True, exist_ok=True)
