@@ -167,8 +167,9 @@ class Scanner:
                                     # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
                                     # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
                                     # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
+                                    # if additional_letter_position > 1:
                                     neighbour_found = True
-                                    break
+                                    break                                    
                             
                             if not neighbour_found:
                                 right_word = ""
@@ -181,6 +182,7 @@ class Scanner:
                                         # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
                                         # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
                                         # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
+                                        # if additional_letter_position > 1:
                                         neighbour_found = True
                                         break
 
