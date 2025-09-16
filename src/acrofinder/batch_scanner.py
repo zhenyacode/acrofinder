@@ -78,6 +78,8 @@ class BatchScanner:
 
             total_chars += len(text)
 
+            res = pd.concat(results, ignore_index=True) if results else pd.DataFrame()
+
         if save_results:
             scan_time = datetime.now()
             timestamp = int(scan_time.timestamp())
@@ -86,7 +88,7 @@ class BatchScanner:
 
             # Сохраняем CSV
             csv_path = self.output_dir / csv_filename
-            df.to_csv(csv_path, index=False, encoding='utf-8-sig')
+            res.to_csv(csv_path, index=False, encoding='utf-8-sig')
             print(f"✅ Результаты сохранены: {csv_path.name}")
 
             # Генерируем и сохраняем TXT-отчёт
@@ -99,7 +101,7 @@ class BatchScanner:
                 scan_time=scan_time,
                 files_processed=len(files),
                 total_chars=total_chars,
-                total_candidates=len(df),
+                total_candidates=len(res),
                 scan_params=scan_params
             )
             txt_path = self.output_dir / txt_filename
@@ -107,7 +109,7 @@ class BatchScanner:
             print(f"📄 Отчёт сохранён: {txt_path.name}")
 
 
-        return pd.concat(results, ignore_index=True) if results else pd.DataFrame()
+        return res
 
 
 
