@@ -46,8 +46,8 @@ class Scanner:
 
         self.cache_results = {}
 
-        # пока заглушка вместо загрузки словаря
         self.dictionary = self._load_dictionary(dictionary_name)
+
         # TODO здесь потенциал оптимизации -- если длинных слов слишком мало
         # то проверять все n-граммы, добивая их до max_word_length малоосмысленно
         self.max_word_length = len(max(self.dictionary, key=len))
@@ -142,13 +142,53 @@ class Scanner:
                     for _ in n_addenda:
                         if possible_word in self.dictionary:
                             
+                            # ===================================================
                             # ВОТ ЗДЕСЬ НАДО РЕАЛИЗОВАТЬ ДОСТРОЙКУ СОСЕДНИХ СЛОВ 
                             # СЛЕВА И СПРАВА
+                            # ===================================================
                             
-                            candidate = self._make_candidate(text, possible_word, level, 
+                            # достаём нужное число vicinity слева и справа
+                            # отдаём каждое по очереди, прибавляя букву,
+                            # в проверку на словоформу -- если проходит, то добавляем 
+                            # кандидата
+
+                            # ДОБАВИТЬ ПРОВЕРКУ id, чтобы не выйти из массива
+                            # СЛЕВА ИЛИ СПРАВА!!!
+
+                            neighbour_found = False
+
+                            left_word = ""
+                            neighbour_range = range(1, self.max_word_length) 
+                            for additional_letter_position in neighbour_range:
+                                if id - additional_letter_position < 0:
+                                    break
+                                left_word = n_grams[id-additional_letter_position] + left_word
+                                if left_word in self.dictionary:
+                                    # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
+                                    # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
+                                    # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
+                                    neighbour_found = True
+                                    break
+                            
+                            if not neighbour_found:
+                                right_word = ""
+                                neighbour_range = range(1, self.max_word_length) 
+                                for additional_letter_position in neighbour_range:
+                                    if id+additional_letter_position >= len(n_grams):
+                                        break
+                                    right_word = right_word + n_grams[id+additional_letter_position] 
+                                    if right_word in self.dictionary:
+                                        # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
+                                        # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
+                                        # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
+                                        neighbour_found = True
+                                        break
+
+                            if neighbour_found:
+                                candidate = self._make_candidate(text, possible_word, level, 
                                                         first_letters, matches, id, 
                                                         len(possible_word))
-                            candidates.append(candidate)
+                                candidates.append(candidate)
 
                         last_len = len(possible_word)
                         possible_word = self._add_letter(first_letters, id, possible_word)
