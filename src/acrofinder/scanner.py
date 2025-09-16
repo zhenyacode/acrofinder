@@ -23,7 +23,7 @@ class Scanner:
     Осуществляет поиск акростихов в тексте
     """
 
-    def __init__(self, min_word_size: int = 5,
+    def __init__(self, min_word_size: int = 5, vicinity_range: int = 5,
                  dictionary_name: str ="") -> None:
 
         """
@@ -34,6 +34,8 @@ class Scanner:
         Аргументы:
             min_word_size (int): скольким буквам нужно совпасть со словом из словаря, 
             чтобы сочетание букв попало в кандидаты в акростихи 
+            vicinity_range (int): сколько букв слева и справа от найденного сочетания
+            показывать в таблице результатов в поле vicinity
             dictionary_name (str): название файла со словарём, лежащего в папке dicts, 
             на основе которого будет вестись поиск
         """    
@@ -42,7 +44,7 @@ class Scanner:
                          'word': r'\b[A-Za-zА-Яа-яЁё]'}
     
         # сколько букв показываем слева и справа от найденного сочетания
-        self.vicinity_range = 5
+        self.vicinity_range = vicinity_range
 
         self.cache_results = {}
 
@@ -56,7 +58,8 @@ class Scanner:
         self.n_dict = self._get_n_gram_dict(self.dictionary, self.min_word_size)
 
 
-    def scan_text(self, text: str, levels:List[str] = ['word']) -> pd.DataFrame:
+    def scan_text(self, text: str, levels:List[str] = ['word'], 
+                  filter_by_neighbours: bool = False, min_neighbour_len: int = 1) -> pd.DataFrame:
         """
         Ищет все возможные акростихи в переданном тексте, возвращает датафрейм с 
         кандидатами (+ окрестности слева и справа) и контекстом в тексте 
@@ -67,6 +70,12 @@ class Scanner:
             text (str): текст, в котором производится поиск акростихов
             levels [str, str, ...]: набор уровней, на которых производится поиск (слова, 
             предложения, абзацы)
+            filter_by_neighbours (bool): если True, то оставлять в результатах только
+            те сочетания первых букв, складывающиеся в слов, у которых слева или справа 
+            также есть сочетания, складывающиеся в слова минимальной длины min_neighbour_len 
+            min_neighbour_len (int): если включена фильтрация по наличию слов среди соседей
+            найденной формы, минимальная длина соседей (чтобы можно было исключать одно-
+            и двух-буквенные слова, попадающиеся случайно)
 
         Возвращает:
             results (pd.DataFrame): сводная таблица результатов поиска 
@@ -82,12 +91,15 @@ class Scanner:
             if level not in valid_levels:
                 raise ValueError(f"Invalid level: {level}. Expected one of: 'paragraph', 'sentence', 'word'")
 
+        if filter_by_neighbours and min_neighbour_len < 1:
+            raise ValueError("min_neighbour_len must be >= 1 when filter_by_neighbours is True")
 
         all_candidates = []  
 
 
         for level in levels:
-            candidates = self._get_candidates(text, level)
+            candidates = self._get_candidates(text, level, 
+                                              filter_by_neighbours, min_neighbour_len)
             all_candidates.extend(candidates)  
 
         # Создаём ОДИН DataFrame в конце
@@ -100,7 +112,8 @@ class Scanner:
 
 
 
-    def _get_candidates(self, text: str, level: str) -> List[AcrosticCandidate]:
+    def _get_candidates(self, text: str, level: str, 
+                        filter_by_neighbours: bool, min_neighbour_len) -> List[AcrosticCandidate]:
         """
         Формирует список слов-кандидатов из последовательности первых букв элементов текста
         на заданном уровне (слова, предложения или абзацы).
@@ -117,15 +130,10 @@ class Scanner:
              - если такое слово найдено — добавляет текущую строку как кандидата в акростих.
           4. Возвращает всех подходящих кандидатов с информацией о позиции, окрестностях и контексте.
 
-        Пример:
-          Из последовательности первых букв «р,ы,б,а,к,и»:
-            - начальная 5-грамма: «рыбак» → есть в словаре → проверяем соседей.
-            - достраиваем до «рыбаки» → тоже есть в словаре → если соседи найдены, добавляем оба.
-            - но только если хотя бы слева или справа есть другое слово из словаря (например, «ак» или «и» — если они есть в словаре и длиной >= минимальной).
-
-        Особенность:
+         Если filter_by_neighbours = True:
           Кандидат добавляется ТОЛЬКО если рядом (слева или справа в последовательности n-грамм)
-          найдено ещё хотя бы одно слово из словаря — это снижает количество случайных совпадений.
+          найдено ещё хотя бы одно слово из словаря минимальной длины min_neighbours_len — это 
+          снижает количество случайных совпадений.
 
         Возвращает:
             List[AcrosticCandidate]: найденные слова-кандидаты и сопутствующая информация.
@@ -148,51 +156,8 @@ class Scanner:
                 for _ in n_addenda:
                     if possible_word in self.dictionary:
                         
-                        # ===================================================
-                        # ВОТ ЗДЕСЬ НАДО РЕАЛИЗОВАТЬ ДОСТРОЙКУ СОСЕДНИХ СЛОВ 
-                        # СЛЕВА И СПРАВА
-                        # ===================================================
-                        
-                        # достаём нужное число vicinity слева и справа
-                        # отдаём каждое по очереди, прибавляя букву,
-                        # в проверку на словоформу -- если проходит, то добавляем 
-                        # кандидата
-
-                        # ДОБАВИТЬ ПРОВЕРКУ id, чтобы не выйти из массива
-                        # СЛЕВА ИЛИ СПРАВА!!!
-
-                        neighbour_found = False
-
-                        left_word = ""
-                        neighbour_range = range(1, self.max_word_length) 
-                        for additional_letter_position in neighbour_range:
-                            if id - additional_letter_position < 0:
-                                break
-                            left_word = n_grams[id-additional_letter_position] + left_word
-                            if left_word in self.dictionary:
-                                # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
-                                # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
-                                # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
-                                # if additional_letter_position > 1:
-                                neighbour_found = True
-                                break                                    
-                        
-                        if not neighbour_found:
-                            right_word = ""
-                            neighbour_range = range(1, self.max_word_length) 
-                            for additional_letter_position in neighbour_range:
-                                if id+additional_letter_position >= len(n_grams):
-                                    break
-                                right_word = right_word + n_grams[id+additional_letter_position] 
-                                if right_word in self.dictionary:
-                                    # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
-                                    # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
-                                    # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
-                                    # if additional_letter_position > 1:
-                                    neighbour_found = True
-                                    break
-
-                        if neighbour_found:
+                        # если нет фильтрации по соседям, или есть, и подходящие соседи есть
+                        if not filter_by_neighbours or self._has_neighbour_word(first_letters, id, min_neighbour_len):
                             candidate = self._make_candidate(text, possible_word, level, 
                                                     first_letters, matches, id, 
                                                     len(possible_word))
@@ -206,6 +171,40 @@ class Scanner:
 
         return candidates
 
+
+    def _has_neighbour_word(self, first_letters: List[str], id: int, min_len) -> bool:
+        """
+        Проверяет, есть ли у заданного сочетания букв, соседнее сочетание,
+        примыкающее слева или справа и образующее словоформу заданной
+        минимальной длины
+        """
+        
+        has_neighbour = False
+
+        left_word = ""
+        neighbour_range = range(1, self.max_word_length) 
+
+        for additional_letter_position in neighbour_range:
+            if id - additional_letter_position < 0:
+                break
+            left_word = first_letters[id-additional_letter_position] + left_word
+            if left_word in self.dictionary and len(left_word) >= min_len:
+                has_neighbour = True
+                break                                    
+
+        if not has_neighbour:
+            right_word = ""
+            neighbour_range = range(1, self.max_word_length) 
+            for additional_letter_position in neighbour_range:
+                if id+additional_letter_position >= len(first_letters):
+                    break
+                right_word = right_word + first_letters[id+additional_letter_position] 
+                if right_word in self.dictionary and len(right_word) >= min_len:
+                    has_neighbour = True
+                    break
+
+        print(f'Проверка {first_letters[id-10: id+10] = }')
+        return has_neighbour            
 
     def _normalize_text(self, text: str) -> str:
         text = self._normalize_spaced_letters(text)
