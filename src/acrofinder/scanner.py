@@ -23,7 +23,7 @@ class Scanner:
     Осуществляет поиск акростихов в тексте
     """
 
-    def __init__(self, min_word_sizes: List[int] = [5],
+    def __init__(self, min_word_size: int = 5,
                  dictionary_name: str ="") -> None:
 
         """
@@ -32,7 +32,7 @@ class Scanner:
         словари n-грамм для более эффективного поиска
 
         Аргументы:
-            min_word_sizes [int, int, ...]: скольким буквам нужно совпасть со словом из словаря, 
+            min_word_size (int): скольким буквам нужно совпасть со словом из словаря, 
             чтобы сочетание букв попало в кандидаты в акростихи 
             dictionary_name (str): название файла со словарём, лежащего в папке dicts, 
             на основе которого будет вестись поиск
@@ -52,8 +52,8 @@ class Scanner:
         # то проверять все n-граммы, добивая их до max_word_length малоосмысленно
         self.max_word_length = len(max(self.dictionary, key=len))
         # print(f'{self.max_word_length = }') # в 20к словаре было  19
-        self.min_word_sizes = min_word_sizes
-        self.n_dicts = self._load_n_dicts(self.dictionary, self.min_word_sizes)
+        self.min_word_size = min_word_size
+        self.n_dict = self._get_n_gram_dict(self.dictionary, self.min_word_size)
 
 
     def scan_text(self, text: str, levels:List[str] = ['word']) -> pd.DataFrame:
@@ -107,16 +107,25 @@ class Scanner:
 
         Алгоритм:
           1. Извлекает первые буквы всех единиц указанного уровня.
-          2. Строит из них n-граммы длиной из self.min_word_sizes.
-          3. Для каждой n-граммы проверяет:
-             - если она соответствует префиксу слов словаря, то постепенно расширяет её,
-               добавляя следующие буквы;
-             - на каждом шаге фиксирует слово как кандидата, если оно есть в словаре.
-          4. В результате собирает все подходящие слова (как короткие, так и удлинённые),
-             с указанием их позиции, «окрестности» и текстового контекста.
+          2. Строит из них скользящим окном n-граммы фиксированной длины = self.min_word_size.
+          3. Для каждой n-граммы, если она совпадает с началом (префиксом) какого-либо 
+         слова из словаря n-грамм:
+             - постепенно расширяет её, добавляя следующие буквы из последовательности;
+             - на каждом шаге, если текущая строка есть в словаре полных словоформ,
+               проверяет наличие соседнего осмысленного слова слева или справа (тоже из словаря,
+               тоже расширяя по букве);
+             - если такое слово найдено — добавляет текущую строку как кандидата в акростих.
+          4. Возвращает всех подходящих кандидатов с информацией о позиции, окрестностях и контексте.
 
-        Таким образом, из первых букв сочетания «рыбаки» будут выделены кандидаты «рыб», «рыба»,
-        «рыбак» и «рыбаки» (при условии, что такие слова есть в словаре).
+        Пример:
+          Из последовательности первых букв «р,ы,б,а,к,и»:
+            - начальная 5-грамма: «рыбак» → есть в словаре → проверяем соседей.
+            - достраиваем до «рыбаки» → тоже есть в словаре → если соседи найдены, добавляем оба.
+            - но только если хотя бы слева или справа есть другое слово из словаря (например, «ак» или «и» — если они есть в словаре и длиной >= минимальной).
+
+        Особенность:
+          Кандидат добавляется ТОЛЬКО если рядом (слева или справа в последовательности n-грамм)
+          найдено ещё хотя бы одно слово из словаря — это снижает количество случайных совпадений.
 
         Возвращает:
             List[AcrosticCandidate]: найденные слова-кандидаты и сопутствующая информация.
@@ -127,75 +136,72 @@ class Scanner:
 
         candidates = []
 
-        # для n-граммы каждого размера получаем кандидатов
-        for n_gram_size in self.min_word_sizes:
-            n_grams = self._get_n_grams(n_gram_size, first_letters)
-            n_dict = self.n_dicts[n_gram_size]
-            all_n_grams = range(len(n_grams))
+        n_grams = self._get_n_grams(self.min_word_size, first_letters)
+        all_n_grams = range(len(n_grams))
             
-            for id in all_n_grams:
-                possible_word = n_grams[id]
-                if possible_word in n_dict:
-                    
-                    n_addenda = range(self.max_word_length - len(possible_word))
-                    
-                    for _ in n_addenda:
-                        if possible_word in self.dictionary:
-                            
-                            # ===================================================
-                            # ВОТ ЗДЕСЬ НАДО РЕАЛИЗОВАТЬ ДОСТРОЙКУ СОСЕДНИХ СЛОВ 
-                            # СЛЕВА И СПРАВА
-                            # ===================================================
-                            
-                            # достаём нужное число vicinity слева и справа
-                            # отдаём каждое по очереди, прибавляя букву,
-                            # в проверку на словоформу -- если проходит, то добавляем 
-                            # кандидата
+        for id in all_n_grams:
+            possible_word = n_grams[id]
+            if possible_word in self.n_dict:
+                
+                n_addenda = range(self.max_word_length - len(possible_word))
+                
+                for _ in n_addenda:
+                    if possible_word in self.dictionary:
+                        
+                        # ===================================================
+                        # ВОТ ЗДЕСЬ НАДО РЕАЛИЗОВАТЬ ДОСТРОЙКУ СОСЕДНИХ СЛОВ 
+                        # СЛЕВА И СПРАВА
+                        # ===================================================
+                        
+                        # достаём нужное число vicinity слева и справа
+                        # отдаём каждое по очереди, прибавляя букву,
+                        # в проверку на словоформу -- если проходит, то добавляем 
+                        # кандидата
 
-                            # ДОБАВИТЬ ПРОВЕРКУ id, чтобы не выйти из массива
-                            # СЛЕВА ИЛИ СПРАВА!!!
+                        # ДОБАВИТЬ ПРОВЕРКУ id, чтобы не выйти из массива
+                        # СЛЕВА ИЛИ СПРАВА!!!
 
-                            neighbour_found = False
+                        neighbour_found = False
 
-                            left_word = ""
+                        left_word = ""
+                        neighbour_range = range(1, self.max_word_length) 
+                        for additional_letter_position in neighbour_range:
+                            if id - additional_letter_position < 0:
+                                break
+                            left_word = n_grams[id-additional_letter_position] + left_word
+                            if left_word in self.dictionary:
+                                # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
+                                # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
+                                # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
+                                # if additional_letter_position > 1:
+                                neighbour_found = True
+                                break                                    
+                        
+                        if not neighbour_found:
+                            right_word = ""
                             neighbour_range = range(1, self.max_word_length) 
                             for additional_letter_position in neighbour_range:
-                                if id - additional_letter_position < 0:
+                                if id+additional_letter_position >= len(n_grams):
                                     break
-                                left_word = n_grams[id-additional_letter_position] + left_word
-                                if left_word in self.dictionary:
+                                right_word = right_word + n_grams[id+additional_letter_position] 
+                                if right_word in self.dictionary:
                                     # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
                                     # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
                                     # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
                                     # if additional_letter_position > 1:
                                     neighbour_found = True
-                                    break                                    
-                            
-                            if not neighbour_found:
-                                right_word = ""
-                                neighbour_range = range(1, self.max_word_length) 
-                                for additional_letter_position in neighbour_range:
-                                    if id+additional_letter_position >= len(n_grams):
-                                        break
-                                    right_word = right_word + n_grams[id+additional_letter_position] 
-                                    if right_word in self.dictionary:
-                                        # ЗДЕСЬ ВОЗМОЖНО ДОБАВИМ ПРОВЕРКУ, ЧТОБЫ
-                                        # ОДНОБУКВЕННЫЕ И ДВУХБУКВЕННЫЕ НЕ ИМЕЛИ ПРИОРИТЕТА
-                                        # ИЛИ ВООБЩЕ ИГНОРИРОВАЛИСЬ
-                                        # if additional_letter_position > 1:
-                                        neighbour_found = True
-                                        break
+                                    break
 
-                            if neighbour_found:
-                                candidate = self._make_candidate(text, possible_word, level, 
-                                                        first_letters, matches, id, 
-                                                        len(possible_word))
-                                candidates.append(candidate)
+                        if neighbour_found:
+                            candidate = self._make_candidate(text, possible_word, level, 
+                                                    first_letters, matches, id, 
+                                                    len(possible_word))
+                            candidates.append(candidate)
 
-                        last_len = len(possible_word)
-                        possible_word = self._add_letter(first_letters, id, possible_word)
-                        if last_len == len(possible_word):
-                            break
+                    last_len = len(possible_word)
+                    possible_word = self._add_letter(first_letters, id, possible_word)
+                    if last_len == len(possible_word):
+                        break
 
 
         return candidates
@@ -306,7 +312,7 @@ class Scanner:
             left_vicinity = left_dummy + left_vicinity
 
         if len(right_vicinity) < self.vicinity_range:
-            right_dummy = '_' * (self.vicinity_range - len(right_vicinity)-1)
+            right_dummy = '_' * (self.vicinity_range - len(right_vicinity))
             right_vicinity = right_dummy + right_vicinity
 
         word = "".join(first_letters[word_start:word_end])
@@ -315,11 +321,13 @@ class Scanner:
         return "".join(left_vicinity) + "_" + word.upper() + "_" + "".join(right_vicinity)
 
 
-    def _get_context(self, text:str, matches: List[re.Match], id_start: int, id_end) -> str:
+    def _get_context(self, text:str, matches: List[re.Match], id_start: int, id_end: int) -> str:
         """
         Получает контекст по позиции найденного совпадения
         """
         position_start = matches[id_start].span()[0]
+        
+        id_end = min(len(matches) - 1, id_end) 
         position_end = matches[id_end].span()[0]
 
         enough_word_length = 10
@@ -329,25 +337,10 @@ class Scanner:
         return context
 
 
-    def _load_n_dicts(self, dictionary: Set[str], n_gram_sizes: List[int]) -> Dict[int, Set[str]]:
-        """
-        Принимает на вход множество слов и возвращает словари n-грам, сделанных из слов длины >= n
-        для каждого n из n_gram_sizes
-        (оболочка над методом _get_n_gram_dict, обрабатывающим единственное значение n)
-        """
-
-        n_dicts = {}
-
-        for n_gram_size in n_gram_sizes:
-            n_dicts[n_gram_size] = self._get_n_gram_dict(self.dictionary, n_gram_size)
-
-        return n_dicts
-
-
     def _get_n_gram_dict(self, dictionary: Set[str], n_gram_size: int) -> Set[str]:
         """
         Принимает на вход множество слов и единственный размер n-граммы, 
-        возвращает словарь n-грам, сделанных из слов длины >= n
+        возвращает словарь n-грам (n-обрезков), сделанных из слов длины >= n
         """
 
         n_dict = [word[0:n_gram_size] for word in dictionary if len(word) >= n_gram_size]
