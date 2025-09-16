@@ -41,15 +41,8 @@ class Scanner:
                          'sentence': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|(?<=[\.\!\?])[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
                          'word': r'\b[A-Za-zА-Яа-яЁё]'}
     
-        # Надо сделать кастомизируемым или минимум: прибить
-        # гвоздями наиболее удобные настройки
-        # self.vicinity_range = vicinity_range
-        # self.context_range = context_range
-        # self.addendum_range = addendum_range
-
+        # сколько букв показываем слева и справа от найденного сочетания
         self.vicinity_range = 5
-        self.context_range = 100 # вместо этого надо просто все слова/ предложения, 
-                                # составляющие сочетание, возвращать
 
         self.cache_results = {}
 
@@ -148,6 +141,10 @@ class Scanner:
                     
                     for _ in n_addenda:
                         if possible_word in self.dictionary:
+                            
+                            # ВОТ ЗДЕСЬ НАДО РЕАЛИЗОВАТЬ ДОСТРОЙКУ СОСЕДНИХ СЛОВ 
+                            # СЛЕВА И СПРАВА
+                            
                             candidate = self._make_candidate(text, possible_word, level, 
                                                         first_letters, matches, id, 
                                                         len(possible_word))
