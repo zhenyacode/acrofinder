@@ -1,0 +1,2 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+45769,5,сосуд,спдэв_СОСУД_котпв,кот,спросил он с участием. -- Да как он туд,word,rus_fiction_dostoevsky_selo-stepanchikovo_1859_roman.txt

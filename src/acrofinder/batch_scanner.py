@@ -2,6 +2,8 @@ from .scanner import Scanner
 from pathlib import Path
 import pandas as pd
 from typing import List, Optional
+from datetime import datetime
+
 
 from tqdm import tqdm
 
@@ -54,7 +56,8 @@ class BatchScanner:
 
     def scan_directory(self, levels: List[str] = ['word'], 
                        filter_by_neighbours: bool = False, 
-                       min_neighbour_len: int = 1) -> pd.DataFrame:
+                       min_neighbour_len: int = 1, 
+                       save_file: bool = True) -> pd.DataFrame:
         """
         Сканирует все .txt файлы в директории, возвращает сводный DataFrame с кандидатами.
         """
@@ -71,6 +74,15 @@ class BatchScanner:
             df = self.scanner.scan_text(text, levels, filter_by_neighbours, min_neighbour_len)
             df['source_file'] = file_path.name 
             results.append(df)
+
+            if save_file:
+                now = datetime.now()
+                filename = f"results_{now.strftime('%y%m%d')}_{int(now.timestamp())}.csv"
+                
+                output_path = self.output_dir / filename
+                df.to_csv(output_path, index=False, encoding='utf-8')
+
+
 
 # ДОБАВИТЬ СОХРАНЕНИЕ В ДИРЕКТОРИЮ РЕЗУЛЬТАТОВ
 

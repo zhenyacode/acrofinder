@@ -1,0 +1,6 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+95355,5,верен,уиннн_ВЕРЕН_протч,про,всех его родственников. Ему не переставая,word,rus_fiction_tolstoy-lev_voskresenie_1899_roman.txt
+306343,5,везет,нечтп_ВЕЗЕТ_котим,кот,"враждебное ему, защищающее ее такою, какая она ",word,rus_fiction_tolstoy-lev_voskresenie_1899_roman.txt
+373238,5,телом,усдам_ТЕЛОМ_бовчс,дам,тем едва ли она могла бы объясни,word,rus_fiction_tolstoy-lev_voskresenie_1899_roman.txt
+874075,5,венок,внчбу_ВЕНОК_годеп,год,"время ехать на обед к генералу.
+",word,rus_fiction_tolstoy-lev_voskresenie_1899_roman.txt

@@ -1,0 +1,3 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+178600,5,подле,тсуеи_ПОДЛЕ_липон,лип,пусть отдуваются. Да Лаптев едва ли и поеде,word,rus_fiction_mamin-sibiryak_gornoe-gnezdo_1884_roman.txt
+603181,5,висит,тдякк_ВИСИТ_спинп,спи,"выбивался из сил, измеряя температуру, считая пул",word,rus_fiction_mamin-sibiryak_gornoe-gnezdo_1884_roman.txt

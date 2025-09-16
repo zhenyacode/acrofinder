@@ -1,0 +1,5 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+207958,5,родом,дядед_РОДОМ_эонож,дед,"рублей, -- отвечала Домна Осиповна.
+   -- Мало это!.. Они",word,rus_fiction_pisemsky_meschiane_1877_roman.txt
+436729,5,озноб,ктбок_ОЗНОБ_наихб,бок,"один знакомый нам, -- отвечал Бегушев неохотно.
+",word,rus_fiction_pisemsky_meschiane_1877_roman.txt

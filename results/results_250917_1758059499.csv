@@ -1,0 +1,3 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+43019,5,умник,обпот_УМНИК_сокмя,пот,у монастыря нынче Иван Карлыч снял! -- о,word,rus_nonfiction_saltykov-tschedrin_blagonamerennye-rechi_1876_journalism.txt
+991310,5,идиот,ткчсл_ИДИОТ_крикв,крик,"или дружба, или о том, какую роль",word,rus_nonfiction_saltykov-tschedrin_blagonamerennye-rechi_1876_journalism.txt

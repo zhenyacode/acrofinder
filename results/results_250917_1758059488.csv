@@ -1,0 +1,22 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+89399,5,пятно,ннизд_ПЯТНО_мздои,изд,получки. Я тут недалеко одно местечко з,word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+89399,6,пятном,оннизд_ПЯТНОМ_здоинз,изд,"получки. Я тут недалеко одно местечко знаю!...
+
+",word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+254657,5,сотен,ксано_СОТЕН_очичи,очи,"существует объективно, т.е.
+независимо от человек",word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+469320,5,диван,толпв_ДИВАН_валут,вал,"директора и в академики, например.
+
+В аппарат ",word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+926034,5,томно,иворр_ТОМНО_воинп,воин,"такая
+огромная масса несправедливо осужденных вернулась ",word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+1268536,5,давно,нэпес_ДАВНО_ввдев,пес,"духовности, а в нашем обществе, враждебном",word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+1420993,5,тупое,откбв_ТУПОЕ_носат,нос,"таки ухитриться поднять общество еще на
+одну ст",word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+1564206,5,пивом,кптпи_ПИВОМ_сиирс,сии,"проходят/ именно в области
+манипулирования с идеями и",word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+1704253,5,носом,тнесн_НОСОМ_поппо,поп,Начальство отвергает существование общественного мнения по очень п,word,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt
+1197053,6,нового,всшвес_НОВОГО_жевибо,вес," Но когда-то его имя часто мелькало в печати. Он
+всю жизнь считался пьяницей и бабником, хотя не пил и был сдержан в быту. О нем
+говорили, что он груб и нетерпим, хотя он был мягок, добр, великодушен. Он всю
+жизнь бедс",sentence,rus_fiction_zinoviev_v-preddverii-raya_1979_roman.txt

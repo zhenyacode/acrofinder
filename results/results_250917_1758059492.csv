@@ -1,0 +1,5 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+132933,5,веско,сбизу_ВЕСКО_оноло,оно,"всей его семьи (которую, однако, она не оче",word,rus_nonfiction_aksakov_semeynaya-khronika_1856_bio.txt
+203807,5,зипун,ппкнф_ЗИПУН_реддс,ред,Зубину и просили у него руки его д,word,rus_nonfiction_aksakov_semeynaya-khronika_1856_bio.txt
+306360,5,звуки,пужас_ЗВУКИ_зипст,ужас,забился в угол кареты и заснул или,word,rus_nonfiction_aksakov_semeynaya-khronika_1856_bio.txt
+407712,6,книжке,вивпил_КНИЖКЕ_ссодив,пил,к нему и жалость к его страдальче,word,rus_nonfiction_aksakov_semeynaya-khronika_1856_bio.txt

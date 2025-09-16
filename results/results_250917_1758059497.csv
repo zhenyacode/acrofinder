@@ -1,0 +1,5 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+29953,5,гости,ессто_ГОСТИ_дппэб,сто,"государства?
+
+Обычно соединяют то и другое при",word,rus_nonfiction_lenin_gosudarstvo-i-revolyutsiya_1917_journalism.txt
+177884,5,шоссе,ансии_ШОССЕ_лпчнс,сии,шутить они с собой едва ли позволя,word,rus_nonfiction_lenin_gosudarstvo-i-revolyutsiya_1917_journalism.txt

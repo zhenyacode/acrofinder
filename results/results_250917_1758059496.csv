@@ -1,0 +1,3 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+215121,5,висит,ситсн_ВИСИТ_чинсс,чин,"вы им скажете именно то, что им нуж",word,rus_nonfiction_gogol_vybrannye-mesta-iz-perepiski-s-druzyami_1847_journalism.txt
+318829,5,ереси,мпчто_ЕРЕСИ_опнин,что,если рассмотреть его строго? Иногда он просто ,word,rus_nonfiction_gogol_vybrannye-mesta-iz-perepiski-s-druzyami_1847_journalism.txt

@@ -1,0 +1,6 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+112460,5,готов,укмне_ГОТОВ_рпврп,мне,"ГЛАВА ОДИННАДЦАТАЯ
+
+   Триродов оставил в Рамееве пр",word,rus_fiction_sologub_kapli-krovi_1905_roman.txt
+197958,6,володи,отсиэо_ВОЛОДИ_обоукн,обо,"вместе от людей, от далеких и от близких",word,rus_fiction_sologub_kapli-krovi_1905_roman.txt
+199116,5,висит,вссон_ВИСИТ_бнтжн,сон,"возможности и силы, и тогда будет нова",word,rus_fiction_sologub_kapli-krovi_1905_roman.txt

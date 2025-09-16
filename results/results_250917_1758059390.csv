@@ -1,0 +1,5 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+21058,5,темно,обнвк_ТЕМНО_тонзэ,тон,то ее мечты... Но она требовала ,word,rus_fiction_dostoevsky_besy_1872_roman.txt
+491574,5,твоим,чпкот_ТВОИМ_пгптв,кот,"тоже вот ожидаю их милости. Потому, го",word,rus_fiction_dostoevsky_besy_1872_roman.txt
+601033,5,сосуд,ямпод_СОСУД_янзчу,под,"сердца.
+   - От слишком уж доброго. Я не знала",word,rus_fiction_dostoevsky_besy_1872_roman.txt

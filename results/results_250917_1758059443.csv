@@ -1,0 +1,2 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+263800,5,кулак,гтбсг_КУЛАК_нотжс,нот,"как у лягушки, а кожа на ощупь т",word,rus_fiction_obruchev_plutoniya_1924_scifi.txt

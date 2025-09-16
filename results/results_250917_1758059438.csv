@@ -1,0 +1,2 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+234395,5,тонко,нолин_ТОНКО_редст,ред,"тот острый нож, которым он ранил ее д",word,rus_fiction_merezhkovsky_aleksandr-i_1913_roman.txt

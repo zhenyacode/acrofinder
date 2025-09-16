@@ -1,0 +1,2 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+94378,5,падая,ровас_ПАДАЯ_птзоп,вас,"по аллее двинул, а я по тротуар",word,rus_fiction_akunin_azazel_1998_roman.txt

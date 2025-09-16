@@ -1,0 +1,5 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+87313,5,приму,ноипв_ПРИМУ_поттк,пот,"по речке.
+
+И мы углубились по Опарихе",word,rus_fiction_astafiev_tsar-ryba_1975_povest.txt
+490450,5,каков,ропоп_КАКОВ_смаче,поп,"к Акимову костру, обсели ведро с медвежат",word,rus_fiction_astafiev_tsar-ryba_1975_povest.txt

@@ -1,0 +1,4 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+29377,5,оперу,иокна_ОПЕРУ_пснуи,окна,он протянул ей руку. Ученица пугливо см,word,rus_fiction_nekrasov_mertvoe-ozero_1851_roman.txt
+453018,5,винчи,утзут_ВИНЧИ_вексн,век,"вот и норовишь человека изуродовать.
+   -- Вот еще ка",word,rus_fiction_nekrasov_mertvoe-ozero_1851_roman.txt

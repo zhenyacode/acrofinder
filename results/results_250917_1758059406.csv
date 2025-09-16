@@ -1,0 +1,4 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+390768,5,видом,гесмп_ВИДОМ_сенид,сени,"Вышел из дома отец, мать сказала ем",word,rus_fiction_gorky_delo-artamonovikh_1925_roman.txt
+402606,5,пером,нмтну_ПЕРОМ_ждишб,жди,"прервал его речь:
+   -- От машин жить дорож",word,rus_fiction_gorky_delo-artamonovikh_1925_roman.txt

@@ -1,0 +1,4 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+345015,5,браво,кднож_БРАВО_вкпми,нож,был рядом. Алешка время от времени ко,word,rus_fiction_limonov_eto-ya-edichka_1979_roman.txt
+482386,5,учили,двжив_УЧИЛИ_пклнп,жив,"умер. Человек из людей, и путался, к",word,rus_fiction_limonov_eto-ya-edichka_1979_roman.txt
+557372,5,ездит,тонос_ЕЗДИТ_дбмвв,нос,"Еленой знакомого дельца из Тбилиси, девка была",word,rus_fiction_limonov_eto-ya-edichka_1979_roman.txt

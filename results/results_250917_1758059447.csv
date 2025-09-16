@@ -1,0 +1,3 @@
+start_pos,n_gram_size,word,vicinity,neighbour,context,level,source_file
+226128,5,гостя,чявон_ГОСТЯ_хвскв,вон,"граф очень серьезным тоном, -- я хотел вас ",word,rus_fiction_pisemsky_boyarschina_1858_roman.txt
+226128,6,гостях,ичявон_ГОСТЯХ_всквву,вон,"граф очень серьезным тоном, -- я хотел вас спроси",word,rus_fiction_pisemsky_boyarschina_1858_roman.txt

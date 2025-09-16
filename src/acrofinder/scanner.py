@@ -1,5 +1,5 @@
 import re
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Optional
 import pandas as pd
 from pathlib import Path
 
@@ -25,7 +25,7 @@ class Scanner:
     """
 
     def __init__(self, min_word_size: int = 5, vicinity_range: int = 5,
-                 dictionary_name: str ="") -> None:
+                 dictionary_name: str ="", custom_dict_search: Optional[List[str]] = None) -> None:
 
         """
         Создаёт объект Scanner, инициализирует конфигурацию (vicinity-, context-, 
@@ -39,6 +39,8 @@ class Scanner:
             показывать в таблице результатов в поле vicinity
             dictionary_name (str): название файла со словарём, лежащего в папке dicts, 
             на основе которого будет вестись поиск
+            custom_dict_search ([str, str, ...]): отдельный набор слов, который мы хотим 
+            найти среди акростихов
         """    
         self.PATTERNS = {'paragraph': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
                          'sentence': r'(?<=\n)[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]|(?<=[\.\!\?])[^A-Za-zА-Яа-яЁё\n]*[A-Za-zА-Яа-яЁё]',
@@ -49,7 +51,10 @@ class Scanner:
 
         self.cache_results = {}
 
-        self.dictionary = self._load_dictionary(dictionary_name)
+        if custom_dict_search:
+            self.dictionary = set(custom_dict_search)
+        else:
+            self.dictionary = self._load_dictionary(dictionary_name)
 
         # TODO здесь потенциал оптимизации -- если длинных слов слишком мало
         # то проверять все n-граммы, добивая их до max_word_length малоосмысленно
@@ -152,14 +157,15 @@ class Scanner:
         for id in all_n_grams:
             possible_word = n_grams[id]
             if possible_word in self.n_dict:
-                
                 n_addenda = range(self.max_word_length - len(possible_word))
                 
                 for _ in n_addenda:
                     if possible_word in self.dictionary:
                         
                         # если нет фильтрации по соседям, или есть, и подходящие соседи есть
-                        has_neighbour, neighbour, = self._has_neighbour_word(first_letters, id, min_neighbour_len) 
+                        has_neighbour, neighbour, = self._has_neighbour_word(first_letters, id, 
+                                                                             len(possible_word),
+                                                                             min_neighbour_len) 
 
                         if not filter_by_neighbours or has_neighbour:
                             candidate = self._make_candidate(text, possible_word, level, 
@@ -176,7 +182,7 @@ class Scanner:
         return candidates
 
 
-    def _has_neighbour_word(self, first_letters: List[str], id: int, min_len) -> bool:
+    def _has_neighbour_word(self, first_letters: List[str], id: int, word_len: int, min_len: int) -> bool:
         """
         Проверяет, есть ли у заданного сочетания букв, соседнее сочетание,
         примыкающее слева или справа и образующее словоформу заданной
@@ -202,9 +208,9 @@ class Scanner:
             right_word = ""
             neighbour_range = range(1, self.max_word_length) 
             for additional_letter_position in neighbour_range:
-                if id+additional_letter_position >= len(first_letters):
+                if id+word_len+additional_letter_position >= len(first_letters):
                     break
-                right_word = right_word + first_letters[id+additional_letter_position] 
+                right_word = right_word + first_letters[id+word_len+additional_letter_position-1]
                 if right_word in self.dictionary and len(right_word) >= min_len:
                     has_neighbour = True
                     neighbour = right_word
