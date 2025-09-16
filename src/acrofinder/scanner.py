@@ -13,6 +13,7 @@ class AcrosticCandidate:
     vicinity: str
     context: str
     level: str
+    neighbour: str
 
     def to_dict(self):
         return asdict(self)
@@ -103,7 +104,8 @@ class Scanner:
             all_candidates.extend(candidates)  
 
         # Создаём ОДИН DataFrame в конце
-        columns = ['start_pos', 'n_gram_size', 'word', 'vicinity', 'context', 'level']
+        columns = ['start_pos', 'n_gram_size', 'word', 
+                   'vicinity', 'neighbour', 'context', 'level']
         results = pd.DataFrame([c.to_dict() for c in all_candidates], 
                                columns=columns) if all_candidates else pd.DataFrame(columns=columns)
 
@@ -157,10 +159,12 @@ class Scanner:
                     if possible_word in self.dictionary:
                         
                         # если нет фильтрации по соседям, или есть, и подходящие соседи есть
-                        if not filter_by_neighbours or self._has_neighbour_word(first_letters, id, min_neighbour_len):
+                        has_neighbour, neighbour, = self._has_neighbour_word(first_letters, id, min_neighbour_len) 
+
+                        if not filter_by_neighbours or has_neighbour:
                             candidate = self._make_candidate(text, possible_word, level, 
                                                     first_letters, matches, id, 
-                                                    len(possible_word))
+                                                    len(possible_word), neighbour)
                             candidates.append(candidate)
 
                     last_len = len(possible_word)
@@ -180,6 +184,7 @@ class Scanner:
         """
         
         has_neighbour = False
+        neighbour = None
 
         left_word = ""
         neighbour_range = range(1, self.max_word_length) 
@@ -190,6 +195,7 @@ class Scanner:
             left_word = first_letters[id-additional_letter_position] + left_word
             if left_word in self.dictionary and len(left_word) >= min_len:
                 has_neighbour = True
+                neighbour = left_word
                 break                                    
 
         if not has_neighbour:
@@ -201,9 +207,10 @@ class Scanner:
                 right_word = right_word + first_letters[id+additional_letter_position] 
                 if right_word in self.dictionary and len(right_word) >= min_len:
                     has_neighbour = True
+                    neighbour = right_word
                     break
 
-        return has_neighbour            
+        return has_neighbour, neighbour            
 
     def _normalize_text(self, text: str) -> str:
         text = self._normalize_spaced_letters(text)
@@ -254,7 +261,7 @@ class Scanner:
 
     def _make_candidate(self, text: str, word: str, level: str, 
                         first_letters: List[str], matches: List[re.Match],
-                        id: int, n_gram_size: int) -> AcrosticCandidate:
+                        id: int, n_gram_size: int, neighbour: str) -> AcrosticCandidate:
         """
         Собирает на входящих параметрах из слова, окрестностей и контекста
         строчку про кандидата в соответствующей форме.
@@ -270,8 +277,10 @@ class Scanner:
                                       word=word,
                                       vicinity=vicinity,
                                       context=context,
-                                      level=level)
+                                      level=level,
+                                      neighbour=neighbour)
         return candidate
+    
 
     def _get_first_letters_and_matches(self, text: str, 
                                        level: str) -> tuple[List[str], List[re.Match]]:
