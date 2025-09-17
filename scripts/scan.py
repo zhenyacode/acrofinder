@@ -57,6 +57,31 @@ def main():
         """
     )
 
+    
+    parser.add_argument(
+        "--neighbours", "-n",
+        type=bool,
+        default=False,
+        help="""
+        Фильтровать возможные акростихи по наличию соседей: если True, то оставлять 
+        в результатах только те сочетания первых букв, складывающиеся в слова, у 
+        которых слева или справа также есть сочетания, складывающиеся в слова 
+        минимальной длины min_neighbour_len
+        """
+    )
+
+        
+    parser.add_argument(
+        "--minneighbourlen", "-mn",
+        type=int,
+        default=2,
+        help="""
+        Если включена фильтрация по наличию слов среди соседей найденной формы, 
+        минимальная длина соседей (например, чтобы можно было исключать одно- 
+        и двухбуквенные слова, попадающиеся случайно). Значение по умолчанию 2
+        """
+    )
+
     parser.add_argument(
         "--custom_dict", "-c",
         type=str,
@@ -88,7 +113,9 @@ def main():
                       custom_dict_search=args.custom_dict)
     batch_scanner = BatchScanner(scanner, args.input)
 
-    batch_scanner.scan_directory(levels=args.levels)
+    batch_scanner.scan_directory(levels=args.levels, 
+                                 filter_by_neighbours=args.neighbours, 
+                                 min_neighbour_len=args.minneighbourlen)
 
 if __name__ == "__main__":
     main()
