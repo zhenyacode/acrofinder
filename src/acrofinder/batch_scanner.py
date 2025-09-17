@@ -4,21 +4,16 @@ import pandas as pd
 from typing import List, Optional
 from datetime import datetime
 
-import sys
-import time
-
-
+# импорт корректного прогресс-бара (для ipynb и командной строки разные)
 try:
     from IPython import get_ipython
     if get_ipython() is not None:
-        # Запущено в Jupyter notebook
         from tqdm.notebook import tqdm
     else:
-        # Запущено в командной строке
         from tqdm import tqdm
 except ImportError:
-    # Fallback для обычного импорта
     from tqdm import tqdm
+
 
 
 class BatchScanner:
@@ -95,7 +90,6 @@ class BatchScanner:
             results.append(df)
 
             total_chars += len(text)
-            sys.stdout.flush()
 
         res = pd.concat(results, ignore_index=True) if results else pd.DataFrame()
 
