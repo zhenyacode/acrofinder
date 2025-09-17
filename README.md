@@ -59,9 +59,8 @@ Acrofinder — это утилита для автоматического по�
 
 ### Вариант 1: Через демонстрационный ноутбук в Google Colab
 
-1. Откройте ноутбук: 👉 [demo_acrofinder.ipynb в Colab](https://colab.research.google.com/github/zhenyacode/acrofinder/blob/main/notebooks/demo_acrofinder.ipynb)
+1. Откройте демонстрационный ноутбук:  [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/zhenyacode/acrofinder/blob/main/notebooks/demo_acrofinder.ipynb)
 
-**ПУНКТЫ НИЖЕ ПОКА НЕ СООТВЕТСТВУЮТ ДЕЙСТВИТЕЛЬНОСТИ**
 2. Нажмите `Runtime → Run all`.
 
 3. Хотите протестировать на своих текстах?
