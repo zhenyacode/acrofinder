@@ -87,7 +87,8 @@ def main():
         type=str,
         default=None,
         help="""
-        Заданный набор слов, который нужно найти среди акростихов
+        Заданный набор слов, который нужно найти среди акростихов. Слова должны 
+        быть в одной строке, разделены пробелами, и строка заключена в кавычки
         """
     )
 
@@ -107,11 +108,20 @@ def main():
 
     args = parser.parse_args()
 
+    custom_words = None
+    if args.custom_dict:
+        custom_words = [w.strip() for w in args.custom_dict.split(",") if w.strip()]
+
+
     scanner = Scanner(min_word_size=args.minlen,
                       vicinity_range=args.vicinity,
                       dictionary_name=args.dict,
-                      custom_dict_search=args.custom_dict)
+                      custom_dict_search=custom_words)
     batch_scanner = BatchScanner(scanner, args.input)
+
+
+
+
 
     batch_scanner.scan_directory(levels=args.levels, 
                                  filter_by_neighbours=args.neighbours, 
