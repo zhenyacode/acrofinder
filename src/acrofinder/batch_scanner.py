@@ -4,8 +4,21 @@ import pandas as pd
 from typing import List, Optional
 from datetime import datetime
 
+import sys
+import time
 
-from tqdm import tqdm
+
+try:
+    from IPython import get_ipython
+    if get_ipython() is not None:
+        # Запущено в Jupyter notebook
+        from tqdm.notebook import tqdm
+    else:
+        # Запущено в командной строке
+        from tqdm import tqdm
+except ImportError:
+    # Fallback для обычного импорта
+    from tqdm import tqdm
 
 
 class BatchScanner:
@@ -67,18 +80,24 @@ class BatchScanner:
 
         files = list(self.directory.glob("*.txt"))
 
-        for file_path in tqdm(files, desc="Processing files"):
+        pbar = tqdm(files, desc="Processing files", mininterval=0.1, miniters=1, dynamic_ncols=True)
+        
+        for file_path in pbar:
             try:
                 text = file_path.read_text(encoding='utf-8')
             except:
                 text = file_path.read_text(encoding='windows-1251')
+        
+
             df = self.scanner.scan_text(text, levels, filter_by_neighbours, min_neighbour_len)
+
             df['source_file'] = file_path.name 
             results.append(df)
 
             total_chars += len(text)
+            sys.stdout.flush()
 
-            res = pd.concat(results, ignore_index=True) if results else pd.DataFrame()
+        res = pd.concat(results, ignore_index=True) if results else pd.DataFrame()
 
         if save_results:
             scan_time = datetime.now()

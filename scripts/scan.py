@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 import pandas as pd
 
+
 # Поднимаем путь, чтобы импортировать Scanner из src
 import sys
 sys.path.append(str(Path(__file__).parent.parent / "src"))
@@ -92,14 +93,10 @@ def main():
                       custom_dict_search=args.custom_dict)
     batch_scanner = BatchScanner(scanner, args.input)
 
-    # Запускаем сканирование
-    # print("🔍 Начинаем поиск акростихов...")
+    print("🔍 Начинаем поиск акростихов...")
     batch_scanner.scan_directory(levels=args.levels)
 
-    # # Сохраняем результаты
-    # results_df.to_csv(args.output, index=False, encoding='utf-8')
-    # print(f"✅ Результаты сохранены в {args.output}")
-    # print(f"📊 Найдено кандидатов: {len(results_df)}")
+
 
 if __name__ == "__main__":
     main()
