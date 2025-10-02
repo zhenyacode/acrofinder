@@ -62,7 +62,7 @@ def main():
         "--neighbours", "-n",
         type=bool,
         default=False,
-        action='store_true'
+        action='store_true',
         help="""
         Фильтровать возможные акростихи по наличию соседей: если True, то оставлять 
         в результатах только те сочетания первых букв, складывающиеся в слова, у 
