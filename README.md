@@ -1,5 +1,7 @@
 # Acrofinder — поиск акростихов в прозе и поэзии
 
+[Статья про исследование и утилиту на Системном Блоке](https://sysblok.ru/philology/chto-takoe-akrostih-i-kak-najti-zashifrovannye-poslanija-v-tekste/)
+
 Acrofinder — это утилита для автоматического поиска акростихов в текстах: по первым буквам слов, предложений или абзацев.
 
 ## Что такое акростих
